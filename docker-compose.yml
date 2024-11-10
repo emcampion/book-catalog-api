@@ -1,0 +1,29 @@
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: book
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: bookcatalog
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 55
+  
+  api:
+    build: .
+    environment:
+      DB_HOST: 127.0.0.1
+      DB_USER: user
+      DB_PASSWORD: book
+      DB_NAME: bookcatalog
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
